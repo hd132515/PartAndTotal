@@ -28,4 +28,6 @@ public:
 
 	UINT getid();
 	std::wstring getnodename();
+
+	bool operator <(const Node& dependency) const;
 };
