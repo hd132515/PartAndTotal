@@ -114,7 +114,7 @@ void CTeilUndAllesView::OnDraw(CDC* pDC)
 	std::chrono::duration<double> elapsed = std::chrono::high_resolution_clock::now() - start;
 	CString str;
 	str.Format(L"%f", elapsed.count());
-	AfxMessageBox(str);
+	//AfxMessageBox(str);
 }
 
 
