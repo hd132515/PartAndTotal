@@ -75,6 +75,8 @@ void CTeilUndAllesView::OnDraw(CDC* pDC)
 	if (!pDoc)
 		return;
 
+	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
+
 	CBitmap bitmap;
 	CBitmap* pOldBmp;
 	CDC MemDC;
@@ -87,29 +89,20 @@ void CTeilUndAllesView::OnDraw(CDC* pDC)
 	pOldBmp = MemDC.SelectObject(&bitmap);
 	MemDC.PatBlt(0, 0, cRect.right, cRect.bottom, WHITENESS);
 
-	auto set_nodegi = pDoc->get_set_nodegi();
-	// TODO: 여기에 원시 데이터에 대한 그리기 코드를 추가합니다.
-	for (auto itr = set_nodegi.begin(); itr != set_nodegi.end(); itr++)
+
+	auto set_dependencygi = pDoc->get_set_dependencygi();
+	for (auto dependency : set_dependencygi)
 	{
-		for (auto sub = itr; sub != set_nodegi.end(); sub++)
-		{
-			auto outbound = (*itr)->getNode()->getOutbound();
-			auto inbound = (*itr)->getNode()->getInbound();
-
-			auto outfinder = outbound.find((*sub)->getNode()->getid());
-			auto infinder = inbound.find((*sub)->getNode()->getid());
-			if (outfinder != outbound.end() || infinder != inbound.end())
-				(*itr)->drawMainDependencyLine(&MemDC, (*sub)->getPoint());
-			
-			if (outfinder != outbound.end())
-				(*itr)->drawDependencyDirection(&MemDC, DependencyDirection::DIR_OUT, (*sub)->getPoint());
-
-			if (infinder != inbound.end())
-				(*itr)->drawDependencyDirection(&MemDC, DependencyDirection::DIR_IN, (*sub)->getPoint());
-		}
-
-		(*itr)->drawNode(&MemDC);
+		dependency->draw_main_line(&MemDC);
+		dependency->draw_direction(&MemDC);
 	}
+
+	auto set_nodegi = pDoc->get_set_nodegi();
+	for (auto node : set_nodegi)
+	{
+		node->drawNode(&MemDC);
+	}
+
 
 	pDC->BitBlt(0, 0, cRect.right, cRect.bottom, &MemDC, 0, 0, SRCCOPY);
 
@@ -382,13 +375,14 @@ void CTeilUndAllesView::OnInitialUpdate()
 	CView::OnInitialUpdate();
 
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
+	
 	CTeilUndAllesDoc* pDoc = GetDocument();
 	for (int i = 0; i < 25; i++)
 	{
 		CPoint point((NODE_WIDTH+30)*((i%5)+1), (NODE_HEIGHT+15)*((i/5)+1));
 		pDoc->add_node(std::wstring(L"node")+std::to_wstring(i+1), point);
 	}
-
+	
 	for (int i = 0; i < 24; i+=1)
 	{
 		for (int j = i + 1; j < 25; j+=1)

@@ -6,8 +6,6 @@
 #define NODE_WIDTH 120
 #define NODE_HEIGHT 60
 
-#define ARROW_LINE_LENGTH 15
-#define ARROW_LINE_DISPLACEMENT (ARROW_LINE_LENGTH * 2)
 
 enum class DependencyDirection
 {
@@ -33,8 +31,6 @@ public:
 private:
 public:
 	void drawNode(CDC* pCDC);
-	void drawMainDependencyLine(CDC* pCDC, CPoint& other_node_pt);
-	void drawDependencyDirection(CDC* pCDC, DependencyDirection direction, CPoint& other_node_pt);
 	void dragging(CPoint& pt);
 	
 	void setSelected(bool _selected = true);

@@ -13,8 +13,6 @@ public:
 private:
 	UINT id;
 	std::wstring nodename;
-	std::set<UINT> inbound_nodes;
-	std::set<UINT> outbound_nodes;
 
 	bool cleared;
 protected:
@@ -24,14 +22,6 @@ public:
 private:
 protected:
 public:
-	void add_inbound_node(UINT id);
-	void add_outbound_node(UINT id);
-
-	void remove_inbound_node(UINT id);
-	void remove_outbound_node(UINT id);
-
-	void modify_inbound_node(UINT sourceId, UINT destId);
-	void modify_outbound_node(UINT sourceId, UINT destId);
 
 	void setid(UINT _id);
 	void setnodename(std::wstring _nodename);
@@ -39,6 +29,5 @@ public:
 	UINT getid();
 	std::wstring getnodename();
 
-	std::set<UINT>& getInbound();
-	std::set<UINT>& getOutbound();
+	bool operator <(const Node& dependency) const;
 };

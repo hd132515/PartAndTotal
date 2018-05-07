@@ -63,6 +63,9 @@
     <ClInclude Include="NewNodeDlg.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
+    <ClInclude Include="DependencyGI.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TeilUndAlles.cpp">
@@ -94,6 +97,9 @@
     </ClCompile>
     <ClCompile Include="NewNodeDlg.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DependencyGI.cpp">
+      <Filter>Frontend</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
