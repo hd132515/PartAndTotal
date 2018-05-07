@@ -6,8 +6,9 @@
 #pragma once
 
 #include <set>
+#include <unordered_map>
 #include "NodeGI.h"
-#include "Project.h"
+#include "DependencyGI.h"
 #include "NewNodeDlg.h"
 
 
@@ -20,6 +21,7 @@ protected: // serialization에서만 만들어집니다.
 private:
 	Project project;
 	std::set<NodeGI*> set_nodegi;
+	std::set<DependencyGI*> set_dependencygi;
 	NodeGI* selectedNodeGI;
 
 // 특성입니다.
@@ -41,6 +43,7 @@ public:
 	Project& getProject();
 	NodeGI* get_selected_node();
 	std::set<NodeGI*>& get_set_nodegi();
+	std::set<DependencyGI*>& get_set_dependencygi();
 
 // 재정의입니다.
 public:

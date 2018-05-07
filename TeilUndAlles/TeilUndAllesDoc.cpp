@@ -39,7 +39,10 @@ CTeilUndAllesDoc::~CTeilUndAllesDoc()
 	{
 		delete nodegi;
 	}
-	set_nodegi.clear();
+	for (auto dependencygi : set_dependencygi)
+	{
+		delete dependencygi;
+	}
 }
 
 BOOL CTeilUndAllesDoc::OnNewDocument()
@@ -149,7 +152,7 @@ void CTeilUndAllesDoc::add_node(std::wstring nodename, CPoint& pt)
 		AfxMessageBox(L"같은 문제 노드가 이미 있음.");
 	}
 	else
-		set_nodegi.insert(new NodeGI(pt, nodeentry));
+		set_nodegi.emplace(new NodeGI(pt, nodeentry));
 }
 
 bool CTeilUndAllesDoc::select_node(CPoint& pt)
@@ -212,7 +215,43 @@ void CTeilUndAllesDoc::remove_selected_node()
 
 void CTeilUndAllesDoc::add_dependency(UINT srcid, UINT dstid)
 {
-	project.structuring_dependence(StructuringType::CREATE, srcid, dstid);
+	if (!project.structuring_dependency(StructuringType::CREATE, srcid, dstid))
+	{
+		DependencyGI* new_dependency = new DependencyGI(srcid, dstid);
+		
+		int flag = 0;
+		for (auto dependency : set_dependencygi)
+		{
+			if (dependency == new_dependency)
+			{
+				delete new_dependency;
+				new_dependency = dependency;
+				flag = 1;
+				break;
+			}
+		}
+		if (!flag)
+		{
+			set_dependencygi.insert(new_dependency);
+			for (auto node : set_nodegi)
+			{
+				UINT nodeid = node->getNode()->getid();
+				if (nodeid == new_dependency->getid1())
+				{
+					new_dependency->set_pointer_for_id1(&node->getPoint());
+				}
+				else if (nodeid == new_dependency->getid2())
+				{
+					new_dependency->set_pointer_for_id2(&node->getPoint());
+				}
+			}
+		}
+
+		if (new_dependency->add_dependency(project.get_last_created_dependency()) < 0)
+		{
+			AfxMessageBox(L"잘못된 의존성 연결");
+		}
+	}
 }
 
 bool CTeilUndAllesDoc::try_dragging(CPoint& pt)
@@ -234,6 +273,11 @@ Project& CTeilUndAllesDoc::getProject()
 NodeGI* CTeilUndAllesDoc::get_selected_node()
 {
 	return selectedNodeGI;
+}
+
+std::set<DependencyGI*>& CTeilUndAllesDoc::get_set_dependencygi()
+{
+	return set_dependencygi;
 }
 
 std::set<NodeGI*>& CTeilUndAllesDoc::get_set_nodegi()
