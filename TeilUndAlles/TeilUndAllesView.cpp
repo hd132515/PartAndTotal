@@ -13,6 +13,7 @@
 #include "TeilUndAllesView.h"
 #include "NewNodeDlg.h"
 
+#include "AbstractGraphicInterface.h"
 #include <chrono>
 
 #ifdef _DEBUG
@@ -93,14 +94,13 @@ void CTeilUndAllesView::OnDraw(CDC* pDC)
 	auto set_dependencygi = pDoc->get_set_dependencygi();
 	for (auto dependency : set_dependencygi)
 	{
-		dependency->draw_main_line(&MemDC);
-		dependency->draw_direction(&MemDC);
+		dependency->draw_dependency(&MemDC);
 	}
 
 	auto set_nodegi = pDoc->get_set_nodegi();
 	for (auto node : set_nodegi)
 	{
-		node->drawNode(&MemDC);
+		node->draw_node(&MemDC);
 	}
 
 
@@ -146,8 +146,17 @@ void CTeilUndAllesView::OnEndPrinting(CDC* /*pDC*/, CPrintInfo* /*pInfo*/)
 
 void CTeilUndAllesView::OnRButtonUp(UINT /* nFlags */, CPoint point)
 {
-	ClientToScreen(&point);
-	OnContextMenu(this, point);
+	if (editing_mode != EditingMode::NONE)
+	{
+		dep_info.srcid = dep_info.dstid = -1;
+		editing_mode = EditingMode::NONE;
+	}
+	else
+	{
+		ClientToScreen(&point);
+		OnContextMenu(this, point);
+	}
+	::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_ARROW));
 }
 
 void CTeilUndAllesView::OnContextMenu(CWnd* /* pWnd */, CPoint point)
@@ -227,19 +236,11 @@ void CTeilUndAllesView::OnRemoveNode()
 
 void CTeilUndAllesView::remove_node(CTeilUndAllesDoc* pDoc)
 {
-	int res;
-	if (!(res = pDoc->validate_selection()))
+	if (AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
 	{
-		AfxMessageBox(L"validate_selection 개발 문제");
-	}
-	else if (res == 1)
-	{
-		if (AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
-		{
-			pDoc->remove_selected_node();
-			pDoc->SetModifiedFlag();
-			pDoc->UpdateAllViews(NULL);
-		}
+		pDoc->remove_selected_node();
+		pDoc->SetModifiedFlag();
+		pDoc->UpdateAllViews(NULL);
 	}
 
 	editing_mode = EditingMode::NONE;
@@ -253,24 +254,28 @@ void CTeilUndAllesView::OnNewDependency()
 
 void CTeilUndAllesView::new_dependency(CTeilUndAllesDoc* pDoc)
 {
-	if (dep_info.srcid == -1)
+	NodeGI* nodegi = NULL;
+	if ((nodegi = dynamic_cast<NodeGI*>(selected)) != NULL)
 	{
-		dep_info.srcid = pDoc->get_selected_node()->getNode()->getid();
-		return;
-	}
-	
-	if (dep_info.dstid == -1)
-	{
-		dep_info.dstid = pDoc->get_selected_node()->getNode()->getid();
-	}
+		if (dep_info.srcid == -1)
+		{
+			dep_info.srcid = nodegi->get_node()->getid();
+			return;
+		}
 
-	if (dep_info.srcid != -1 && dep_info.dstid != -1)
-	{
-		pDoc->add_dependency(dep_info.srcid, dep_info.dstid);
-		pDoc->SetModifiedFlag();
-		pDoc->UpdateAllViews(NULL);
-		editing_mode = EditingMode::NONE;
-		dep_info.srcid = dep_info.dstid = -1;
+		if (dep_info.dstid == -1)
+		{
+			dep_info.dstid = nodegi->get_node()->getid();
+		}
+
+		if (dep_info.srcid != -1 && dep_info.dstid != -1)
+		{
+			pDoc->add_dependency(dep_info.srcid, dep_info.dstid);
+			pDoc->SetModifiedFlag();
+			pDoc->UpdateAllViews(NULL);
+			editing_mode = EditingMode::NONE;
+			dep_info.srcid = dep_info.dstid = -1;
+		}
 	}
 }
 
@@ -280,8 +285,14 @@ void CTeilUndAllesView::OnRemoveDependency()
 	editing_mode = EditingMode::REMOVE_DEP;
 }
 
-void CTeilUndAllesView::remove_dependency(CPoint& pt)
+void CTeilUndAllesView::remove_dependency(CTeilUndAllesDoc* pDoc)
 {
+	if (AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
+	{
+		pDoc->remove_selected_dependency();
+		pDoc->UpdateAllViews(NULL);
+		editing_mode = EditingMode::NONE;
+	}
 }
 
 void CTeilUndAllesView::OnModifyDependency()
@@ -301,7 +312,8 @@ BOOL CTeilUndAllesView::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 	// TODO: 여기에 메시지 처리기 코드를 추가 및/또는 기본값을 호출합니다.
 	if (editing_mode == EditingMode::CREATE_NODE ||
 		editing_mode == EditingMode::REMOVE_NODE || 
-		editing_mode == EditingMode::CREATE_DEP)
+		editing_mode == EditingMode::CREATE_DEP ||
+		editing_mode == EditingMode::REMOVE_DEP)
 	{
 		::SetCursor(AfxGetApp()->LoadStandardCursor(IDC_CROSS));
 		return TRUE;
@@ -328,6 +340,7 @@ void CTeilUndAllesView::OnLButtonUp(UINT nFlags, CPoint point)
 		new_dependency(pDoc);
 		break;
 	case EditingMode::REMOVE_DEP:
+		remove_dependency(pDoc);
 		break;
 	case EditingMode::MODIFY_DEP:
 		break;
@@ -345,9 +358,10 @@ void CTeilUndAllesView::OnLButtonDown(UINT nFlags, CPoint point)
 	dragging = true;
 	if (editing_mode == EditingMode::NONE || 
 		editing_mode == EditingMode::REMOVE_NODE ||
-		editing_mode == EditingMode::CREATE_DEP)
+		editing_mode == EditingMode::CREATE_DEP ||
+		editing_mode == EditingMode::REMOVE_DEP)
 	{
-		pDoc->select_node(point);
+		selected = pDoc->select_interface(point);
 		pDoc->UpdateAllViews(NULL);
 	}
 
@@ -376,20 +390,12 @@ void CTeilUndAllesView::OnInitialUpdate()
 
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
 	
-	CTeilUndAllesDoc* pDoc = GetDocument();
-	for (int i = 0; i < 25; i++)
+	/*CTeilUndAllesDoc* pDoc = GetDocument();
+	for (int i = 0; i < 100; i++)
 	{
-		CPoint point((NODE_WIDTH+30)*((i%5)+1), (NODE_HEIGHT+15)*((i/5)+1));
+		CPoint point((NODE_WIDTH+30)*((i%10)+1), (NODE_HEIGHT+15)*((i/10)+1));
 		pDoc->add_node(std::wstring(L"node")+std::to_wstring(i+1), point);
-	}
-	
-	for (int i = 0; i < 24; i+=1)
-	{
-		for (int j = i + 1; j < 25; j+=1)
-		{
-			pDoc->add_dependency(i, j);
-		}
-	}
+	}*/
 }
 
 

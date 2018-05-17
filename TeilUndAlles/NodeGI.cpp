@@ -8,7 +8,9 @@
 //  * Node* _nodeentry : the node entry is initialized properly [not null]
 // return
 //  NodeGI class
-NodeGI::NodeGI(CPoint& _pt, Node* _nodeentry) : nodeentry(_nodeentry), pt(_pt), selected(false)
+NodeGI::NodeGI(int _id, CPoint& _pt, Node* _nodeentry) :
+	AbstractGraphicInterface(_id),
+	nodeentry(_nodeentry), pt(_pt)
 {
 	int x0 = pt.x - NODE_WIDTH / 2;
 	int y0 = pt.y - NODE_HEIGHT / 2;
@@ -28,7 +30,7 @@ NodeGI::~NodeGI()
 {
 }
 
-void NodeGI::drawNode(CDC* pCDC)
+void NodeGI::draw_node(CDC* pCDC)
 {
 	CString text(nodeentry->getnodename().c_str());
 
@@ -60,27 +62,26 @@ void NodeGI::dragging(CPoint& _pt)
 	drawArea.bottom = y1;
 }
 
-void NodeGI::setSelected(bool _selected)
-{
-	selected = _selected;
-}
-
-RECT NodeGI::getDrawArea()
+RECT NodeGI::get_draw_area()
 {
 	return drawArea;
 }
 
-CPoint& NodeGI::getPoint()
+CPoint& NodeGI::get_point()
 {
 	return pt;
 }
 
-Node* NodeGI::getNode()
+Node* NodeGI::get_node()
 {
 	return nodeentry;
 }
 
-bool NodeGI::isSelected()
+void NodeGI::selection_method(CPoint& pt)
 {
-	return selected;
+	if (PtInRect(&drawArea, pt))
+	{
+		selected = true;
+	}
+	else selected = false;
 }

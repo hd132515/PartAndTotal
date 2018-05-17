@@ -1,26 +1,23 @@
 #pragma once
 
 #include <vector>
-#include "Project.h"
-
-#define ID1_TO_ID2 0b00000001
-#define ID2_TO_ID1 0b00000010
+#include "AbstractGraphicInterface.h"
+#include "Dependency.h"
 
 #define ARROW_LINE_LENGTH 15
-#define ARROW_LINE_DISPLACEMENT (ARROW_LINE_LENGTH * 2)
+#define ARROW_LINE_DISPLACEMENT (int)(ARROW_LINE_LENGTH)
 
-class DependencyGI
+#define SELECTION_RANGE 15
+
+class DependencyGI : public AbstractGraphicInterface
 {
 public:
-	DependencyGI(UINT _id1, UINT _id2);
+	DependencyGI(int _id, Dependency* _dependency_entry);
 	~DependencyGI();
 
 	//member variables' area
 private:
-	UINT id1;
-	UINT id2;
-	BYTE direction;
-
+	Dependency* dependency_entry;
 	CPoint* id1pt;
 	CPoint* id2pt;
 protected:
@@ -34,13 +31,12 @@ public:
 	void set_pointer_for_id1(CPoint* _id1pt);
 	void set_pointer_for_id2(CPoint* _id2pt);
 
-	int add_dependency(Dependency& dependency);
+	void draw_dependency(CDC* pCDC);
 
-	void draw_main_line(CDC* pCDC);
-	void draw_direction(CDC* pCDC);
+	Dependency* get_dependency();
 
-	UINT getid1();
-	UINT getid2();
+	CPoint get_point1();
+	CPoint get_point2();
 
-	bool operator == (const DependencyGI& dependency);
+	virtual void selection_method(CPoint& pt);
 };

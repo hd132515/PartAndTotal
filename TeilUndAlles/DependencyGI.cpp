@@ -2,18 +2,10 @@
 #include "DependencyGI.h"
 
 
-DependencyGI::DependencyGI(UINT _id1, UINT _id2) : direction(0), id1pt(NULL), id2pt(NULL)
+DependencyGI::DependencyGI(int _id, Dependency* _dependency_entry) :
+	AbstractGraphicInterface(_id),
+	dependency_entry(_dependency_entry), id1pt(NULL), id2pt(NULL)
 {
-	if (_id1 > _id2)
-	{
-		id1 = _id2;
-		id2 = _id1;
-	}
-	else
-	{
-		id1 = _id1;
-		id2 = _id2;
-	}
 }
 
 DependencyGI::~DependencyGI()
@@ -30,35 +22,30 @@ void DependencyGI::set_pointer_for_id2(CPoint* _id2pt)
 	id2pt = _id2pt;
 }
 
-// parameters
-// return
-// * -1 : invalid srcid or dstid
-// * 0 : success
-int DependencyGI::add_dependency(Dependency& dependency)
-{
-	bool criterion1 = dependency.srcid == id1;
-	bool criterion2 = dependency.srcid == id2;
-	bool criterion3 = dependency.dstid == id1;
-	bool criterion4 = dependency.dstid == id2;
 
-	if (criterion1 && criterion4)
+void DependencyGI::draw_dependency(CDC* pCDC)
+{
+	CPen pen(PS_SOLID, 3, RGB(0, 0, 0)); 
+	CPen* oldPen = NULL;
+
+	if (selected)
 	{
-		direction |= ID1_TO_ID2;
-		return 0;
-	}
-	if (criterion2 && criterion3)
-	{
-		direction |= ID2_TO_ID1;
-		return 0;
+		oldPen = pCDC->SelectObject(&pen);
 	}
 
-	return -1;
-}
-
-void DependencyGI::draw_main_line(CDC* pCDC)
-{
 	pCDC->MoveTo(id1pt->x, id1pt->y);
 	pCDC->LineTo(id2pt->x, id2pt->y);
+
+
+	if (dependency_entry->has1to2())
+		draw_a_to_b_dir(pCDC, *id1pt, *id2pt);
+	if (dependency_entry->has2to1())
+		draw_a_to_b_dir(pCDC, *id2pt, *id1pt);
+	
+	if (selected)
+	{
+		pCDC->SelectObject(oldPen);
+	}
 }
 
 void DependencyGI::draw_a_to_b_dir(CDC* pCDC, CPoint& a, CPoint& b)
@@ -104,25 +91,37 @@ void DependencyGI::draw_a_to_b_dir(CDC* pCDC, CPoint& a, CPoint& b)
 	pCDC->LineTo(arrowline2[1].x, arrowline2[1].y);
 }
 
-void DependencyGI::draw_direction(CDC* pCDC)
+Dependency* DependencyGI::get_dependency()
 {
-	if (direction & ID1_TO_ID2)
-		draw_a_to_b_dir(pCDC, *id1pt, *id2pt);
-	if (direction & ID2_TO_ID1)
-		draw_a_to_b_dir(pCDC, *id2pt, *id1pt);
+	return dependency_entry;
 }
 
-UINT DependencyGI::getid1()
+CPoint DependencyGI::get_point1()
 {
-	return id1;
+	return *id1pt;
 }
 
-UINT DependencyGI::getid2()
+CPoint DependencyGI::get_point2()
 {
-	return id2;
+	return *id2pt;
 }
 
-bool DependencyGI::operator ==(const DependencyGI& dependency)
+void DependencyGI::selection_method(CPoint& pt)
 {
-	return id1 == dependency.id1 && id2 == dependency.id2;
+	CPoint pt1 = *id1pt;
+	CPoint pt2 = *id2pt;
+	if (pt1.x <= pt.x && pt.x <= pt2.x || pt2.x <= pt.x && pt.x <= pt1.x)
+	{
+		CSize displ = (pt1 - pt2);
+		CPoint normal_vector(displ.cy, -displ.cx);
+		double c = -(normal_vector.x * pt1.x + normal_vector.y * pt1.y);
+		double len = abs(normal_vector.x * pt.x + normal_vector.y * pt.y + c) / sqrt(normal_vector.x * normal_vector.x + normal_vector.y * normal_vector.y);
+		if (len < SELECTION_RANGE)
+		{
+			selected = true;
+		}
+		else
+			selected = false;
+	}
+	else selected = false;
 }

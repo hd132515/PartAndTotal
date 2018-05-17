@@ -276,6 +276,16 @@ BEGIN
     LTEXT           "........",IDC_STATIC,135,92,22,8
 END
 
+IDD_DELETE_DEP DIALOGEX 0, 0, 189, 90
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "의존성 제거"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "취소",IDC_CLOSE,7,63,175,20
+    PUSHBUTTON      "",IDC_SELECTION2,7,35,175,20
+    PUSHBUTTON      "",IDC_SELECTION1,7,7,175,20
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -339,6 +349,14 @@ BEGIN
         TOPMARGIN, 7
         BOTTOMMARGIN, 169
     END
+
+    IDD_DELETE_DEP, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 182
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 83
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -349,6 +367,11 @@ END
 //
 
 IDD_NEW_NODE AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_DELETE_DEP AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include "AbstractGraphicInterface.h"
 #include "Node.h"
 
 #define NODE_WIDTH 120
@@ -12,10 +13,10 @@ enum class DependencyDirection
 	DIR_OUT, DIR_IN
 };
 
-class NodeGI
+class NodeGI : public AbstractGraphicInterface
 {
 public:
-	NodeGI(CPoint& _pt, Node* _nodeentry);
+	NodeGI(int _id, CPoint& _pt, Node* _nodeentry);
 	~NodeGI();
 
 	//member variables' area
@@ -23,20 +24,18 @@ private:
 	Node* nodeentry;
 	CPoint pt;
 	RECT drawArea;
-	bool selected;
 protected:
 public:
 
 	//member functions' area
 private:
 public:
-	void drawNode(CDC* pCDC);
+	void draw_node(CDC* pCDC);
 	void dragging(CPoint& pt);
-	
-	void setSelected(bool _selected = true);
 
-	RECT getDrawArea();
-	CPoint& getPoint();
-	Node* getNode();
-	bool isSelected();
+	RECT get_draw_area();
+	CPoint& get_point();
+	Node* get_node();
+
+	virtual void selection_method(CPoint& pt);
 };

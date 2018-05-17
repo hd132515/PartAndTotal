@@ -22,6 +22,7 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="분기병합설명서.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="TeilUndAlles.h">
@@ -57,14 +58,38 @@
     <ClInclude Include="NodeGI.h">
       <Filter>Frontend</Filter>
     </ClInclude>
-    <ClInclude Include="MainViewInterface.h">
-      <Filter>Frontend</Filter>
-    </ClInclude>
     <ClInclude Include="NewNodeDlg.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Dependency.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="DeleteDependencyDlg.h">
       <Filter>헤더 파일</Filter>
     </ClInclude>
     <ClInclude Include="DependencyGI.h">
       <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="AbstractGraphicInterface.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="FileStructure.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicType.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Dictionary.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="Primitives.h">
+      <Filter>Backend</Filter>
+    </ClInclude>
+    <ClInclude Include="FrontendFileStructure.h">
+      <Filter>Frontend</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphFileStructure.h">
+      <Filter>Backend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +125,18 @@
     </ClCompile>
     <ClCompile Include="DependencyGI.cpp">
       <Filter>Frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="Dependency.cpp">
+      <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="DeleteDependencyDlg.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="AbstractGraphicInterface.cpp">
+      <Filter>Frontend</Filter>
+    </ClCompile>
+    <ClCompile Include="Dictionary.cpp">
+      <Filter>Backend</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -183,15 +183,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
+    <Text Include="분기병합설명서.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BasicType.h" />
     <ClInclude Include="ChildFrm.h" />
+    <ClInclude Include="DeleteDependencyDlg.h" />
+    <ClInclude Include="Dependency.h" />
     <ClInclude Include="DependencyGI.h" />
+    <ClInclude Include="Dictionary.h" />
+    <ClInclude Include="FileStructure.h" />
+    <ClInclude Include="FrontendFileStructure.h" />
+    <ClInclude Include="GraphFileStructure.h" />
     <ClInclude Include="MainFrm.h" />
-    <ClInclude Include="MainViewInterface.h" />
+    <ClInclude Include="AbstractGraphicInterface.h" />
     <ClInclude Include="NewNodeDlg.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="NodeGI.h" />
+    <ClInclude Include="Primitives.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
@@ -201,8 +210,12 @@
     <ClInclude Include="TeilUndAllesView.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AbstractGraphicInterface.cpp" />
     <ClCompile Include="ChildFrm.cpp" />
+    <ClCompile Include="DeleteDependencyDlg.cpp" />
+    <ClCompile Include="Dependency.cpp" />
     <ClCompile Include="DependencyGI.cpp" />
+    <ClCompile Include="Dictionary.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="NewNodeDlg.cpp" />
     <ClCompile Include="Node.cpp" />

@@ -4,6 +4,7 @@
 
 #pragma once
 
+class AbstractGraphicInterface;
 
 enum class EditingMode {
 	NONE,
@@ -30,6 +31,7 @@ private:
 	EditingMode editing_mode;
 	DependencyInfo dep_info;
 	bool dragging;
+	AbstractGraphicInterface* selected;
 
 // 특성입니다.
 public:
@@ -61,7 +63,7 @@ protected:
 	void add_node(CTeilUndAllesDoc* pDoc, CPoint& pt);
 	void remove_node(CTeilUndAllesDoc* pDoc);
 	void new_dependency(CTeilUndAllesDoc* pDoc);
-	void remove_dependency(CPoint& pt);
+	void remove_dependency(CTeilUndAllesDoc* pDoc);
 	void modify_dependency(CPoint& pt);
 
 // 생성된 메시지 맵 함수

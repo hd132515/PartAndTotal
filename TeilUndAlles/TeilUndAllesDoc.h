@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "NodeGI.h"
 #include "DependencyGI.h"
+#include "Project.h"
 #include "NewNodeDlg.h"
 
 
@@ -22,7 +23,11 @@ private:
 	Project project;
 	std::set<NodeGI*> set_nodegi;
 	std::set<DependencyGI*> set_dependencygi;
-	NodeGI* selectedNodeGI;
+	std::set<UINT> used_id;
+	AbstractGraphicInterface* selected_obj;
+
+private:
+	int possible_gi_id();
 
 // 특성입니다.
 public:
@@ -30,18 +35,19 @@ public:
 // 작업입니다.
 public:
 	void add_node(std::wstring nodename, CPoint& pt);
-	bool select_node(CPoint& pt);
-	int validate_selection();
 	void remove_selected_node();
 
 	void add_dependency(UINT srcid, UINT dstid);
-
+	void remove_selected_dependency();
+	
 	bool try_dragging(CPoint& pt);
 
+	AbstractGraphicInterface* select_interface(CPoint& pt);
+
+	void export_graphic_interface(unsigned char** buffer_pointer, UINT* buffer_length);
 
 public:
 	Project& getProject();
-	NodeGI* get_selected_node();
 	std::set<NodeGI*>& get_set_nodegi();
 	std::set<DependencyGI*>& get_set_dependencygi();
 
@@ -72,4 +78,6 @@ protected:
 	// 검색 처리기에 대한 검색 콘텐츠를 설정하는 도우미 함수
 	void SetSearchContent(const CString& value);
 #endif // SHARED_HANDLERS
+public:
+	virtual void DeleteContents();
 };

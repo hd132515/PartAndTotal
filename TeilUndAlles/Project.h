@@ -2,6 +2,8 @@
 
 #include <unordered_map>
 #include "Node.h"
+#include "Dependency.h"
+
 
 enum class StructuringType
 {
@@ -13,14 +15,6 @@ enum class ModifyingType
 	SRC, DST
 };
 
-struct Dependency
-{
-	Dependency();
-	Dependency(UINT _srcid, UINT _dstid);
-	UINT srcid;
-	UINT dstid;
-	bool Dependency::operator <(const Dependency& dependency) const;
-};
 
 class Project
 {
@@ -30,19 +24,18 @@ public:
 
 	//member variables' area
 private:
-	UINT auto_id_counter;
+	UINT node_auto_increment, dep_auto_increment;
 	std::unordered_map<UINT, Node*> all_nodes_by_id;
 	std::unordered_map<std::wstring, Node*> all_nodes_by_name;
-	std::set<Dependency> all_dependencies;
+	std::unordered_map<UINT, Dependency*> all_dependencies;
 
-	Dependency last_created_dependency;
 protected:
 public:
 	
 	//member functions' area
 private:
 	// parameters
-	// * Node* node : the node being removed
+	// * UINT nodeid : the node being removed
 	void remove_all_dependency_for_node(UINT nodeid);
 protected:
 public:
@@ -77,24 +70,24 @@ public:
 	// * std::wstring src_nodename : the name of a node that is sub problem node
 	// * std::wstring dst_nodename : the name of a node that is main problem node
 	// return value
-	// * 2 : not existing dependency to remove
-	// * 1 : already existing dependency to create
+	// * 2 : new entry of dependency
+	// * 1 : the entry of dependency was destroyed.
 	// * 0 : success
 	// * -1 : the first parameter is not a identifier of existing node.
 	// * -2 : the second parameter is not a identifier of existing node.
-	int structuring_dependency(StructuringType type, std::wstring src_nodename, std::wstring dst_nodename);
+	int structuring_dependency(StructuringType type, std::wstring src_nodename, std::wstring dst_nodename, Dependency** created);
 
 	// parameters
 	// * StructuringType type : dependency can be structured by two ways. One wat is creating, otherwise remove.
 	// * UINT srcid : the identifier of node that is sub problem node
 	// * UINT dstid : the identifier of node that is main problem node
 	// return value
-	// * 2 : not existing dependency to remove
-	// * 1 : already existing dependency to create
+	// * 2 : new entry of dependency
+	// * 1 : the entry of dependency was destroyed.
 	// * 0 : success
 	// * -1 : the first parameter is not a identifier of existing node.
 	// * -2 : the second parameter is not a identifier of existing node.
-	int structuring_dependency(StructuringType type, UINT srcid, UINT dstid);
+	int structuring_dependency(StructuringType type, UINT srcid, UINT dstid, Dependency** created);
 
 
 
@@ -122,8 +115,6 @@ public:
 	// * 0 ; success
 	int modify_dependency(ModifyingType type, UINT srcid, UINT dstid, UINT changed);
 
-	Dependency get_last_created_dependency();
-
 
 
 	// parameters
@@ -138,4 +129,12 @@ public:
 	// return value
 	//  return NULL if there is a no node whose name is <nodename>, otherwise node pointer
 	Node* get_node_from_id(UINT id);
+
+
+	// parameters
+	// * char** buffer_pointer : the pointer of the buffer of type char*
+	// * UINT* length : the pointer of the length of type UINT
+	// return value
+	//  0 : success
+	int export_project_to_buffer(unsigned char** buffer_pointer, UINT* length);
 };
