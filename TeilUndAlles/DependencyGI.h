@@ -9,9 +9,12 @@
 
 #define SELECTION_RANGE 15
 
+struct DependencyGIDescriptor;
+
 class DependencyGI : public AbstractGraphicInterface
 {
 public:
+	static DependencyGI* deserialize(DependencyGIDescriptor* desc, Dependency* dep, bool selected);
 	DependencyGI(int _id, Dependency* _dependency_entry);
 	~DependencyGI();
 

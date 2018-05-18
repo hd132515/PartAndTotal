@@ -386,6 +386,7 @@ void CTeilUndAllesDoc::export_graphic_interface(unsigned char** buffer_pointer, 
 	{
 		dependencygi_table[cnt].id = dependencygi.second->get_id();
 		dependencygi_table[cnt].dependency_id = dependencygi.second->get_dependency()->getid();
+		cnt++;
 	}
 
 	unsigned char* layer_buffer = new unsigned char[header.gen_header.layerlength];
@@ -423,12 +424,9 @@ void CTeilUndAllesDoc::import_graphic_interface(unsigned char* buffer)
 	// creation of nodes
 	for (int i = 0; i < header->number_of_nodes; i++)
 	{
-		CPoint pt;
-		pt.x = nodegi_table[i].x; pt.y = nodegi_table[i].y;
-
-		NodeGI* new_node = new NodeGI(nodegi_table[i].id, pt,
-			project.get_node_from_id(nodegi_table[i].node_id));
-
+		NodeGI* new_node = NodeGI::deserialize(nodegi_table + i,
+			project.get_node_from_id(nodegi_table[i].node_id),
+			header->selected_interface_id == nodegi_table[i].id);
 
 		set_nodegi[new_node->get_id()] = new_node;
 		used_id.insert(new_node->get_id());
@@ -437,8 +435,9 @@ void CTeilUndAllesDoc::import_graphic_interface(unsigned char* buffer)
 	// creation of dependency
 	for (int i = 0; i < header->number_of_dependency; i++)
 	{
-		DependencyGI* new_dep = new DependencyGI(dependencygi_table[i].id, 
-			project.get_dependency(dependencygi_table[i].dependency_id));
+		DependencyGI* new_dep = DependencyGI::deserialize(dependencygi_table + i,
+			project.get_dependency(dependencygi_table[i].dependency_id),
+			header->selected_interface_id == dependencygi_table[i].id);
 
 		Dependency* entry = new_dep->get_dependency();
 		for (auto node : set_nodegi)

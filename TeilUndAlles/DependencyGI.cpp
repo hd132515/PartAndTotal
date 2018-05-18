@@ -1,6 +1,16 @@
 #include "stdafx.h"
+#include "FrontendFileStructure.h"
 #include "DependencyGI.h"
 
+
+DependencyGI* DependencyGI::deserialize(DependencyGIDescriptor* desc, Dependency* dep, bool selected)
+{
+	DependencyGI* new_dep = new DependencyGI(desc->id, dep);
+
+	new_dep->selected = selected;
+
+	return new_dep;
+}
 
 DependencyGI::DependencyGI(int _id, Dependency* _dependency_entry) :
 	AbstractGraphicInterface(_id),

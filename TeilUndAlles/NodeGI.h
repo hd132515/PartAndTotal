@@ -17,6 +17,7 @@ enum class DependencyDirection
 class NodeGI : public AbstractGraphicInterface
 {
 public:
+	static NodeGI* deserialize(NodeGIDescriptor* desc, Node* node, bool selected);
 	NodeGI(int _id, CPoint& _pt, Node* _nodeentry);
 	~NodeGI();
 

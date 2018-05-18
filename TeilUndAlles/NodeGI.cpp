@@ -3,6 +3,17 @@
 #include "FrontendFileStructure.h"
 
 
+NodeGI* NodeGI::deserialize(NodeGIDescriptor* desc, Node* node, bool selected)
+{
+	CPoint pt;
+	pt.x = desc->x; pt.y = desc->y;
+
+	NodeGI* new_node = new NodeGI(desc->id, pt, node);
+	new_node->selected = selected;
+
+	return new_node;
+}
+
 // description
 //  the constructor of NodeGI class
 // parameters
