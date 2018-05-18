@@ -5,11 +5,13 @@
 
 #include "BasicType.h"
 #include "Dictionary.h"
+#include "GraphFileStructure.h"
 
 
 class Node
 {
 public:
+	static Node* deserialize_from_descriptor(NodeDescriptor* descriptor, unsigned char* buffer);
 	Node(UINT _id, std::wstring _nodename);
 	~Node();
 	
@@ -34,4 +36,5 @@ public:
 	std::wstring getnodename();
 
 	bool operator <(const Node& dependency) const;
+
 };

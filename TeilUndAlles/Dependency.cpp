@@ -1,6 +1,15 @@
 #include "stdafx.h"
+#include "GraphFileStructure.h"
 #include "Dependency.h"
 
+
+Dependency* Dependency::deserialize_from_descriptor(DependencyDescriptor* descriptor)
+{
+	Dependency* new_dep = new Dependency(descriptor->id, descriptor->node_id1, descriptor->node_id2);
+	new_dep->direction = descriptor->direction;
+
+	return new_dep;
+}
 
 Dependency::Dependency(UINT _id, UINT _id1, UINT _id2) : id(_id), direction(0)
 {

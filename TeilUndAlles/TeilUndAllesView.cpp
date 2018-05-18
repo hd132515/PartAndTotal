@@ -94,13 +94,13 @@ void CTeilUndAllesView::OnDraw(CDC* pDC)
 	auto set_dependencygi = pDoc->get_set_dependencygi();
 	for (auto dependency : set_dependencygi)
 	{
-		dependency->draw_dependency(&MemDC);
+		dependency.second->draw_dependency(&MemDC);
 	}
 
 	auto set_nodegi = pDoc->get_set_nodegi();
 	for (auto node : set_nodegi)
 	{
-		node->draw_node(&MemDC);
+		node.second->draw_node(&MemDC);
 	}
 
 

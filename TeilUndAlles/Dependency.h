@@ -4,6 +4,9 @@
 #define ID1_TO_ID2 0b00000001
 #define ID2_TO_ID1 0b00000010
 
+
+struct DependencyDescriptor;
+
 enum class DirectionConstruct
 {
 	CREATE, REMOVE
@@ -12,6 +15,7 @@ enum class DirectionConstruct
 class Dependency
 {
 public:
+	static Dependency* deserialize_from_descriptor(DependencyDescriptor* descriptor);
 	Dependency(UINT _id, UINT _id1, UINT _id2);
 
 private:

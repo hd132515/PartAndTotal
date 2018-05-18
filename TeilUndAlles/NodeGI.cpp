@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "NodeGI.h"
+#include "FrontendFileStructure.h"
+
 
 // description
 //  the constructor of NodeGI class

@@ -207,6 +207,12 @@ Node* Project::get_node_from_id(UINT id)
 	return all_nodes_by_id[id];
 }
 
+Dependency* Project::get_dependency(UINT id)
+{
+	if (all_dependencies.find(id) == all_dependencies.end()) return NULL;
+	return all_dependencies[id];
+}
+
 
 int Project::export_project_to_buffer(unsigned char** buffer_pointer, UINT* length)
 {
@@ -311,5 +317,42 @@ int Project::export_project_to_buffer(unsigned char** buffer_pointer, UINT* leng
 	*buffer_pointer = layer_buffer;
 	*length = buffer_pos;
 
+	return 0;
+}
+
+int Project::import_project_from_buffer(unsigned char* buffer)
+{
+	unsigned int buffer_pos = 0;
+
+	GraphProjectLayerHeader *header = (GraphProjectLayerHeader*)(buffer+buffer_pos);
+	buffer_pos += sizeof(GraphProjectLayerHeader);
+
+	NodeDescriptor* nodes_table = (NodeDescriptor*)(buffer + buffer_pos);
+	buffer_pos += sizeof(NodeDescriptor) * header->number_of_nodes;
+
+	DependencyDescriptor* dependency_table = (DependencyDescriptor*)(buffer + buffer_pos);
+	buffer_pos += sizeof(DependencyDescriptor) * header->number_of_dependency;
+
+
+	// creation of nodes
+	for (int i = 0; i < header->number_of_nodes; i++)
+	{
+		Node* new_node = Node::deserialize_from_descriptor(nodes_table + i, buffer);
+		if (new_node == NULL) return -1;
+
+		all_nodes_by_id[new_node->getid()] = new_node;
+		all_nodes_by_name[new_node->getnodename()] = new_node;
+	}
+
+	// creation of dependencies
+	for (int i = 0; i < header->number_of_dependency; i++)
+	{
+		Dependency* new_dependency = Dependency::deserialize_from_descriptor(dependency_table + i);
+		if (new_dependency == NULL) return -1;
+
+		all_dependencies[new_dependency->getid()] = new_dependency;
+	}
+	
+	
 	return 0;
 }

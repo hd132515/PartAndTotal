@@ -54,4 +54,5 @@ public:
 
 	unsigned int get_serializing_length();
 	int serialize_all(unsigned char** buffer_pointer);
+	int deserialize_all(unsigned char* buffer);
 };

@@ -12,6 +12,8 @@
 #include "TeilUndAllesDoc.h"
 #include "DeleteDependencyDlg.h"
 #include "TeilUndAllesView.h"
+
+#include "GraphFileStructure.h"
 #include "FrontendFileStructure.h"
 
 #include <propkey.h>
@@ -71,10 +73,35 @@ void CTeilUndAllesDoc::Serialize(CArchive& ar)
 
 		ar.Write(project_data, project_length);
 		ar.Write(gi_data, gi_length);
+
+		delete[] project_data;
+		delete[] gi_data;
 	}
 	else
 	{
 		// TODO: 여기에 로딩 코드를 추가합니다.
+		CFile* file = ar.GetFile();
+		while (true)
+		{
+			LayerHeader gen_header;
+			if (!file->Read((void*)&gen_header, sizeof(LayerHeader)))break;
+			file->Seek(-(int)(sizeof(LayerHeader)), CFile::current);
+
+			unsigned char* buffer = new unsigned char[gen_header.layerlength];
+			file->Read(buffer, gen_header.layerlength);
+
+			switch (gen_header.layertype)
+			{
+			case GRAPH_FILE:
+				project.import_project_from_buffer(buffer);
+				break;
+			case GI_FILE:
+				import_graphic_interface(buffer);
+				break;
+			}
+
+			delete[] buffer;
+		}
 	}
 }
 
@@ -149,7 +176,7 @@ void CTeilUndAllesDoc::Dump(CDumpContext& dc) const
 
 // CTeilUndAllesDoc 명령
 
-int CTeilUndAllesDoc::possible_gi_id()
+UINT CTeilUndAllesDoc::possible_gi_id()
 {
 	UINT possible_id = 0;
 	while(true)
@@ -171,8 +198,9 @@ void CTeilUndAllesDoc::add_node(std::wstring nodename, CPoint& pt)
 	}
 	else
 	{
-		NodeGI* node_gi = new NodeGI(possible_gi_id(), pt, nodeentry);
-		set_nodegi.insert(node_gi);
+		UINT id = possible_gi_id();
+		NodeGI* node_gi = new NodeGI(id, pt, nodeentry);
+		set_nodegi[id] = node_gi;
 	}
 }
 
@@ -187,9 +215,10 @@ void CTeilUndAllesDoc::remove_selected_node()
 			return;
 		}
 
-		used_id.erase(selectedNodeGI->get_id());
+		UINT id = selectedNodeGI->get_id();
+		used_id.erase(id);
 		delete selectedNodeGI;
-		set_nodegi.erase(selectedNodeGI);
+		set_nodegi.erase(id);
 	}
 }
 
@@ -210,14 +239,14 @@ void CTeilUndAllesDoc::add_dependency(UINT srcid, UINT dstid)
 
 		for (auto node : set_nodegi)
 		{
-			UINT nodeid = node->get_node()->getid();
+			UINT nodeid = node.second->get_node()->getid();
 			if(nodeid == new_dependency->getid1())
-				new_gi->set_pointer_for_id1(&node->get_point());
+				new_gi->set_pointer_for_id1(&node.second->get_point());
 			else if(nodeid == new_dependency->getid2())
-				new_gi->set_pointer_for_id2(&node->get_point());
+				new_gi->set_pointer_for_id2(&node.second->get_point());
 		}
 
-		set_dependencygi.insert(new_gi);
+		set_dependencygi[new_gi->get_id()] = new_gi;
 	}
 }
 
@@ -262,9 +291,10 @@ void CTeilUndAllesDoc::remove_selected_dependency()
 
 		if (project.structuring_dependency(StructuringType::REMOVE, srcid, dstid, NULL) == 1)
 		{
-			used_id.erase(selectedDependencyGI->get_id());
+			UINT id = selectedDependencyGI->get_id();
+			used_id.erase(id);
 			delete selectedDependencyGI;
-			set_dependencygi.erase(selectedDependencyGI);
+			set_dependencygi.erase(id);
 		}
 	}
 }
@@ -291,23 +321,33 @@ AbstractGraphicInterface* CTeilUndAllesDoc::select_interface(CPoint& pt)
 
 	for (auto nodegi : set_nodegi)
 	{
-		if (nodegi->select_interface(pt))
+		if (nodegi.second->select_interface(pt))
 		{
-			selected_obj = nodegi;
+			selected_obj = nodegi.second;
 			return selected_obj;
 		}
 	}
 
 	for (auto dependencygi : set_dependencygi)
 	{
-		if (dependencygi->select_interface(pt))
+		if (dependencygi.second->select_interface(pt))
 		{
-			selected_obj = dependencygi;
+			selected_obj = dependencygi.second;
 			return selected_obj;
 		}
 	}
 
 	return NULL;
+}
+
+std::unordered_map<UINT, NodeGI*>& CTeilUndAllesDoc::get_set_nodegi()
+{
+	return set_nodegi;
+}
+
+std::unordered_map<UINT, DependencyGI*>& CTeilUndAllesDoc::get_set_dependencygi()
+{
+	return set_dependencygi;
 }
 
 void CTeilUndAllesDoc::export_graphic_interface(unsigned char** buffer_pointer, UINT* buffer_length)
@@ -334,18 +374,18 @@ void CTeilUndAllesDoc::export_graphic_interface(unsigned char** buffer_pointer, 
 	int cnt = 0;
 	for (auto nodegi : set_nodegi)
 	{
-		nodegi_table[cnt].id = nodegi->get_id();
-		nodegi_table[cnt].node_id = nodegi->get_node()->getid();
-		nodegi_table[cnt].x = nodegi->get_point().x;
-		nodegi_table[cnt].y = nodegi->get_point().y;
+		nodegi_table[cnt].id = nodegi.second->get_id();
+		nodegi_table[cnt].node_id = nodegi.second->get_node()->getid();
+		nodegi_table[cnt].x = nodegi.second->get_point().x;
+		nodegi_table[cnt].y = nodegi.second->get_point().y;
 		cnt++;
 	}
 
 	cnt = 0;
 	for (auto dependencygi : set_dependencygi)
 	{
-		dependencygi_table[cnt].id = dependencygi->get_id();
-		dependencygi_table[cnt].dependency_id = dependencygi->get_dependency()->getid();
+		dependencygi_table[cnt].id = dependencygi.second->get_id();
+		dependencygi_table[cnt].dependency_id = dependencygi.second->get_dependency()->getid();
 	}
 
 	unsigned char* layer_buffer = new unsigned char[header.gen_header.layerlength];
@@ -367,19 +407,57 @@ void CTeilUndAllesDoc::export_graphic_interface(unsigned char** buffer_pointer, 
 	*buffer_length = buffer_pos;
 }
 
+void CTeilUndAllesDoc::import_graphic_interface(unsigned char* buffer)
+{
+	unsigned int buffer_pos = 0;
+	GraphicInterfaceLayerHeader* header = (GraphicInterfaceLayerHeader*)(buffer+buffer_pos);
+	buffer_pos += sizeof(GraphicInterfaceLayerHeader);
+
+	NodeGIDescriptor* nodegi_table = (NodeGIDescriptor*)(buffer + buffer_pos);
+	buffer_pos += sizeof(NodeGIDescriptor) * header->number_of_nodes;
+
+	DependencyGIDescriptor* dependencygi_table = (DependencyGIDescriptor*)(buffer + buffer_pos);
+	buffer_pos += sizeof(DependencyGIDescriptor) * header->number_of_dependency;
+
+
+	// creation of nodes
+	for (int i = 0; i < header->number_of_nodes; i++)
+	{
+		CPoint pt;
+		pt.x = nodegi_table[i].x; pt.y = nodegi_table[i].y;
+
+		NodeGI* new_node = new NodeGI(nodegi_table[i].id, pt,
+			project.get_node_from_id(nodegi_table[i].node_id));
+
+
+		set_nodegi[new_node->get_id()] = new_node;
+		used_id.insert(new_node->get_id());
+	}
+
+	// creation of dependency
+	for (int i = 0; i < header->number_of_dependency; i++)
+	{
+		DependencyGI* new_dep = new DependencyGI(dependencygi_table[i].id, 
+			project.get_dependency(dependencygi_table[i].dependency_id));
+
+		Dependency* entry = new_dep->get_dependency();
+		for (auto node : set_nodegi)
+		{
+			UINT nodeid = node.second->get_node()->getid();
+			if (nodeid == entry->getid1())
+				new_dep->set_pointer_for_id1(&node.second->get_point());
+			else if (nodeid == entry->getid2())
+				new_dep->set_pointer_for_id2(&node.second->get_point());
+		}
+
+		set_dependencygi[new_dep->get_id()] = new_dep;
+		used_id.insert(new_dep->get_id());
+	}
+}
+
 Project& CTeilUndAllesDoc::getProject()
 {
 	return project;
-}
-
-std::set<DependencyGI*>& CTeilUndAllesDoc::get_set_dependencygi()
-{
-	return set_dependencygi;
-}
-
-std::set<NodeGI*>& CTeilUndAllesDoc::get_set_nodegi()
-{
-	return set_nodegi;
 }
 
 void CTeilUndAllesDoc::DeleteContents()
@@ -387,11 +465,11 @@ void CTeilUndAllesDoc::DeleteContents()
 	// TODO: 여기에 특수화된 코드를 추가 및/또는 기본 클래스를 호출합니다.
 	for (auto nodegi : set_nodegi)
 	{
-		delete nodegi;
+		delete nodegi.second;
 	}
 	for (auto dependencygi : set_dependencygi)
 	{
-		delete dependencygi;
+		delete dependencygi.second;
 	}
 
 	CDocument::DeleteContents();

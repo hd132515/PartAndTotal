@@ -130,6 +130,7 @@ public:
 	//  return NULL if there is a no node whose name is <nodename>, otherwise node pointer
 	Node* get_node_from_id(UINT id);
 
+	Dependency* get_dependency(UINT id);
 
 	// parameters
 	// * char** buffer_pointer : the pointer of the buffer of type char*
@@ -137,4 +138,6 @@ public:
 	// return value
 	//  0 : success
 	int export_project_to_buffer(unsigned char** buffer_pointer, UINT* length);
+
+	int import_project_from_buffer(unsigned char* buffer);
 };

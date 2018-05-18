@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include <set>
 #include <unordered_map>
 #include "NodeGI.h"
 #include "DependencyGI.h"
@@ -21,13 +20,13 @@ protected: // serialization에서만 만들어집니다.
 
 private:
 	Project project;
-	std::set<NodeGI*> set_nodegi;
-	std::set<DependencyGI*> set_dependencygi;
+	std::unordered_map<UINT, NodeGI*> set_nodegi;
+	std::unordered_map<UINT, DependencyGI*> set_dependencygi;
 	std::set<UINT> used_id;
 	AbstractGraphicInterface* selected_obj;
 
 private:
-	int possible_gi_id();
+	UINT possible_gi_id();
 
 // 특성입니다.
 public:
@@ -44,12 +43,13 @@ public:
 
 	AbstractGraphicInterface* select_interface(CPoint& pt);
 
-	void export_graphic_interface(unsigned char** buffer_pointer, UINT* buffer_length);
+	std::unordered_map<UINT, NodeGI*>& get_set_nodegi();
+	std::unordered_map<UINT, DependencyGI*>& get_set_dependencygi();
 
+	void export_graphic_interface(unsigned char** buffer_pointer, UINT* buffer_length);
+	void import_graphic_interface(unsigned char* buffer);
 public:
 	Project& getProject();
-	std::set<NodeGI*>& get_set_nodegi();
-	std::set<DependencyGI*>& get_set_dependencygi();
 
 // 재정의입니다.
 public:

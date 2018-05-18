@@ -1,6 +1,17 @@
 #include "stdafx.h"
 #include "Node.h"
 
+Node* Node::deserialize_from_descriptor(NodeDescriptor* descriptor, unsigned char* buffer)
+{
+	UINT id = descriptor->node_id;
+	std::wstring name = (wchar_t*)(buffer + descriptor->location_of_name);
+
+	Node* new_node = new Node(descriptor->node_id, name);
+	if (new_node->general_data.deserialize_all(buffer + descriptor->location_of_gen_data))return NULL;
+
+	return new_node;
+}
+
 Node::Node(UINT _id, std::wstring _nodename) : id(_id), nodename(_nodename)
 {
 }

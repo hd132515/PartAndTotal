@@ -7,6 +7,7 @@
 #define NODE_WIDTH 120
 #define NODE_HEIGHT 60
 
+struct NodeGIDescriptor;
 
 enum class DependencyDirection
 {

@@ -417,3 +417,78 @@ int Dictionary::serialize_all(unsigned char** buffer_pointer)
 
 	return 0;
 }
+
+int Dictionary::deserialize_all(unsigned char* buffer)
+{
+	unsigned int buffer_pos = 0;
+	if (buffer[buffer_pos] != '[') return -1;
+	buffer_pos += sizeof(char);
+
+	while (buffer[buffer_pos] != ']')
+	{
+		std::wstring key_name = (wchar_t*)(buffer + buffer_pos);
+		buffer_pos += (key_name.length() + 1) * sizeof(wchar_t);
+
+		size_t _typeid = *((size_t*)(buffer + buffer_pos));
+		buffer_pos += sizeof(size_t);
+
+		if (_typeid == typeid(Boolean).hash_code())
+		{
+			dict[key_name] = new Boolean(*(bool*)(buffer + buffer_pos));
+			buffer_pos += sizeof(bool);
+		}
+		else if (_typeid == typeid(Int8).hash_code())
+		{
+			dict[key_name] = new Int8(*(char*)(buffer + buffer_pos));
+			buffer_pos += sizeof(char);
+		}
+		else if (_typeid == typeid(Int16).hash_code())
+		{
+			dict[key_name] = new Int16(*(short*)(buffer + buffer_pos));
+			buffer_pos += sizeof(short);
+		}
+		else if (_typeid == typeid(Int32).hash_code())
+		{
+			dict[key_name] = new Int32(*(int*)(buffer + buffer_pos));
+			buffer_pos += sizeof(int);
+		}
+		else if (_typeid == typeid(Int64).hash_code())
+		{
+			dict[key_name] = new Int64(*(long long*)(buffer + buffer_pos));
+			buffer_pos += sizeof(long long);
+		}
+		else if (_typeid == typeid(UInt8).hash_code())
+		{
+			dict[key_name] = new UInt8(*(unsigned char*)(buffer + buffer_pos));
+			buffer_pos += sizeof(unsigned char);
+		}
+		else if (_typeid == typeid(UInt16).hash_code())
+		{
+			dict[key_name] = new UInt16(*(unsigned short*)(buffer + buffer_pos));
+			buffer_pos += sizeof(unsigned short);
+		}
+		else if (_typeid == typeid(UInt32).hash_code())
+		{
+			dict[key_name] = new UInt32(*(unsigned int*)(buffer + buffer_pos));
+			buffer_pos += sizeof(unsigned int);
+		}
+		else if (_typeid == typeid(UInt64).hash_code())
+		{
+			dict[key_name] = new UInt64(*(unsigned long long*)(buffer + buffer_pos));
+			buffer_pos += sizeof(unsigned long long);
+		}
+		else if (_typeid == typeid(Float).hash_code())
+		{
+			dict[key_name] = new Float(*(float*)(buffer + buffer_pos));
+			buffer_pos += sizeof(float);
+		}
+		else if (_typeid == typeid(String).hash_code())
+		{
+			std::wstring data_str = std::wstring((wchar_t*)(buffer + buffer_pos));
+			dict[key_name] = new String(data_str);
+			buffer_pos += sizeof(wchar_t) * data_str.length();
+		}
+	}
+
+	return 0;
+}
