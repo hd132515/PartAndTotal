@@ -32,7 +32,6 @@
 #define IDC_DATETIMEPICKER1             1007
 #define IDC_CHECK1                      1008
 #define IDC_CHECK2                      1009
-#define IDC_EDIT4                       1010
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773

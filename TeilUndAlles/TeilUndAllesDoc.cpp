@@ -455,6 +455,8 @@ void CTeilUndAllesDoc::import_graphic_interface(unsigned char* buffer)
 		DependencyGI* new_dep = DependencyGI::deserialize(dependencygi_table + i,
 			project.get_dependency(dependencygi_table[i].dependency_id),
 			header->selected_interface_id == dependencygi_table[i].id);
+		if (header->selected_interface_id == dependencygi_table[i].id)
+			selected_obj = new_dep;
 
 		Dependency* entry = new_dep->get_dependency();
 		for (auto node : set_nodegi)

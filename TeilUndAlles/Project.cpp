@@ -84,6 +84,12 @@ int Project::structuring_dependency(StructuringType type, UINT srcid, UINT dstid
 
 	if (type == StructuringType::CREATE)
 	{
+		while (true)
+		{
+			auto id_finder = all_dependencies.find(dep_auto_increment);
+			if (id_finder == all_dependencies.end()) break;
+			dep_auto_increment++;
+		}
 		Dependency* dependency = new Dependency(dep_auto_increment, srcid, dstid);
 
 		int flag = 0;
@@ -99,7 +105,7 @@ int Project::structuring_dependency(StructuringType type, UINT srcid, UINT dstid
 		}
 		if (!flag)
 		{
-			all_dependencies[dep_auto_increment++] = (dependency);
+			all_dependencies[dep_auto_increment] = (dependency);
 		}
 		dependency->construct_direction(DirectionConstruct::CREATE, srcid, dstid);
 		if (created != NULL) *created = dependency;
