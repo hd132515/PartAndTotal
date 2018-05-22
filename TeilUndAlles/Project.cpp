@@ -15,7 +15,6 @@ Project::~Project()
 		delete node.second;
 	}
 	all_nodes_by_id.clear();
-	all_nodes_by_name.clear();
 
 	for (auto dependency : all_dependencies)
 	{
@@ -26,9 +25,6 @@ Project::~Project()
 
 Node* Project::add_node(std::wstring nodename)
 {
-	auto finder = all_nodes_by_name.find(nodename);
-	if (finder != all_nodes_by_name.end()) return NULL;
-
 	while (true)
 	{
 		auto id_finder = all_nodes_by_id.find(node_auto_increment);
@@ -36,9 +32,11 @@ Node* Project::add_node(std::wstring nodename)
 		node_auto_increment++;
 	}
 
+	if (nodename == L"")
+		nodename = L"node" + std::to_wstring(node_auto_increment);
+
 	Node* new_node = new Node(node_auto_increment, nodename);
 	all_nodes_by_id[node_auto_increment] = new_node;
-	all_nodes_by_name[nodename] = new_node;
 
 	return new_node;
 }
@@ -54,23 +52,10 @@ void Project::remove_all_dependency_for_node(UINT nodeid)
 
 	for (auto itr : all_dependencies_deleted)
 	{
+		Dependency* dep = itr->second;
 		all_dependencies.erase(itr);
+		delete dep;
 	}
-}
-
-int Project::remove_node(std::wstring nodename)
-{
-	auto name_finder = all_nodes_by_name.find(nodename);
-	if (name_finder == all_nodes_by_name.end()) return -1;
-
-	UINT id = name_finder->second->getid();
-	remove_all_dependency_for_node(id);
-
-	delete name_finder->second;
-	all_nodes_by_name.erase(nodename);
-	all_nodes_by_id.erase(id);
-
-	return 0;
 }
 
 int Project::remove_node(UINT id)
@@ -79,30 +64,14 @@ int Project::remove_node(UINT id)
 	if (id_finder == all_nodes_by_id.end()) return -1;
 
 	Node* node = id_finder->second;
-	std::wstring nodename = node->getnodename();
 	remove_all_dependency_for_node(id);
 
-	all_nodes_by_name.erase(nodename);
 	all_nodes_by_id.erase(id);
 	delete node;
 
 	return 0;
 }
 
-int Project::structuring_dependency(StructuringType type, std::wstring src_nodename, std::wstring dst_nodename, Dependency** created)
-{
-	auto src_finder = all_nodes_by_name.find(src_nodename);
-	if (src_finder == all_nodes_by_name.end()) return -1;
-
-	auto dst_finder = all_nodes_by_name.find(dst_nodename);
-	if (dst_finder == all_nodes_by_name.end()) return -2;
-
-
-	UINT srcid = src_finder->second->getid();
-	UINT dstid = dst_finder->second->getid();
-
-	return structuring_dependency(type, srcid, dstid, created);
-}
 
 int Project::structuring_dependency(StructuringType type, UINT srcid, UINT dstid, Dependency** created)
 {
@@ -158,24 +127,6 @@ int Project::structuring_dependency(StructuringType type, UINT srcid, UINT dstid
 	return 0;
 }
 
-int Project::modify_dependency(ModifyingType type, std::wstring src_nodename, std::wstring dst_nodename, std::wstring changed)
-{
-	auto elem_checker = all_nodes_by_name.find(changed);
-	if (elem_checker == all_nodes_by_name.end()) return -3;
-
-	int res = structuring_dependency(StructuringType::REMOVE, src_nodename, dst_nodename, NULL);
-	if (res) return res;
-
-	if (type == ModifyingType::SRC)
-		res = structuring_dependency(StructuringType::CREATE, changed, dst_nodename, NULL);
-	else if (type == ModifyingType::DST)
-		res = structuring_dependency(StructuringType::CREATE, src_nodename, dst_nodename, NULL);
-
-	if (res) return res;
-
-	return 0;
-}
-
 int Project::modify_dependency(ModifyingType type, UINT srcid, UINT dstid, UINT changed)
 {
 	auto elem_checker = all_nodes_by_id.find(changed);
@@ -194,12 +145,6 @@ int Project::modify_dependency(ModifyingType type, UINT srcid, UINT dstid, UINT 
 	return 0;
 }
 
-Node* Project::get_node_from_name(std::wstring nodename)
-{
-	if (all_nodes_by_name.find(nodename) == all_nodes_by_name.end()) return NULL;
-
-	return all_nodes_by_name[nodename];
-}
 
 Node* Project::get_node_from_id(UINT id)
 {
@@ -277,7 +222,7 @@ int Project::export_project_to_buffer(unsigned char** buffer_pointer, UINT* leng
 		if (node.second->general_data.serialize_all(&gen_data) == -1) return -1;
 		memcpy(general_data_table + relative_data_pos, gen_data, datalength);
 		relative_data_pos += datalength;
-		delete gen_data;
+		delete[] gen_data;
 	}
 
 
@@ -341,7 +286,6 @@ int Project::import_project_from_buffer(unsigned char* buffer)
 		if (new_node == NULL) return -1;
 
 		all_nodes_by_id[new_node->getid()] = new_node;
-		all_nodes_by_name[new_node->getnodename()] = new_node;
 	}
 
 	// creation of dependencies

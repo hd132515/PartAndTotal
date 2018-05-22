@@ -18,11 +18,21 @@
 #define ID_WINDOW_MANAGER               131
 #define IDS_EDIT_MENU                   306
 #define IDD_NEW_NODE                    310
+#define IDD_DETIALINFORMATIONVIEW       311
 #define IDD_DELETE_DEP                  312
+#define IDD_DEPENDENCY_DETAIL           315
+#define IDD_SELECT_OBJ                  317
 #define IDC_NODE_NAME                   1000
 #define IDC_CLOSE                       1001
 #define IDC_SELECTION2                  1002
 #define IDC_SELECTION1                  1003
+#define IDC_EDIT1                       1004
+#define IDC_EDIT2                       1005
+#define IDC_EDIT3                       1006
+#define IDC_DATETIMEPICKER1             1007
+#define IDC_CHECK1                      1008
+#define IDC_CHECK2                      1009
+#define IDC_EDIT4                       1010
 #define ID_32771                        32771
 #define ID_32772                        32772
 #define ID_32773                        32773
@@ -51,9 +61,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        314
+#define _APS_NEXT_RESOURCE_VALUE        319
 #define _APS_NEXT_COMMAND_VALUE         32794
-#define _APS_NEXT_CONTROL_VALUE         1002
-#define _APS_NEXT_SYMED_VALUE           310
+#define _APS_NEXT_CONTROL_VALUE         1009
+#define _APS_NEXT_SYMED_VALUE           312
 #endif
 #endif

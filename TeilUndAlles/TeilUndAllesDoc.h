@@ -9,7 +9,6 @@
 #include "NodeGI.h"
 #include "DependencyGI.h"
 #include "Project.h"
-#include "NewNodeDlg.h"
 
 
 class CTeilUndAllesDoc : public CDocument
@@ -33,7 +32,7 @@ public:
 
 // 작업입니다.
 public:
-	void add_node(std::wstring nodename, CPoint& pt);
+	void add_node(CPoint& pt);
 	void remove_selected_node();
 
 	void add_dependency(UINT srcid, UINT dstid);
@@ -48,6 +47,7 @@ public:
 
 	void export_graphic_interface(unsigned char** buffer_pointer, UINT* buffer_length);
 	void import_graphic_interface(unsigned char* buffer);
+
 public:
 	Project& getProject();
 

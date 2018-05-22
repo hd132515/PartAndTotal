@@ -16,66 +16,88 @@ Dictionary::~Dictionary()
 
 void Dictionary::write(std::wstring key, bool data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new Boolean(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, char data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new Int8(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, short data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new Int16(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, int data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new Int32(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, long long data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new Int64(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, unsigned char data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new UInt8(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, unsigned short data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new UInt16(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, unsigned int data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new UInt32(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, unsigned long long data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new UInt64(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, float data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new Float(data);
 	dict[key] = _data;
 }
 
 void Dictionary::write(std::wstring key, std::wstring data)
 {
+	auto itr = dict.find(key);
+	if (itr != dict.end()) delete itr->second;
 	Object* _data = new String(data);
 	dict[key] = _data;
 }
@@ -296,7 +318,7 @@ unsigned int Dictionary::get_serializing_length()
 
 	for (auto keyval : dict)
 	{
-		total_len += (keyval.first.length()+1); // include delimiter
+		total_len += (keyval.first.length()+1)*sizeof(wchar_t); // include delimiter
 		total_len += sizeof(size_t);			// data typeid
 		DICT_TYPE_SZ_OPERATION_START;
 
@@ -313,7 +335,7 @@ unsigned int Dictionary::get_serializing_length()
 		DICT_TYPE_SZ_OPERATION(Float)
 		if (_typeid == typeid(String).hash_code())
 		{
-			total_len += ((String*)keyval.second)->data.length()*sizeof(wchar_t) + 1;
+			total_len += (((String*)keyval.second)->data.length() + 1)*sizeof(wchar_t);
 		}
 	}
 
@@ -335,67 +357,67 @@ int Dictionary::serialize_all(unsigned char** buffer_pointer)
 	for (auto keyval : dict)
 	{
 		//key string
-		memcpy(buffer_pointer + pos, keyval.first.c_str(), sizeof(wchar_t) * keyval.first.length());
+		memcpy(buffer + pos, keyval.first.c_str(), sizeof(wchar_t) * keyval.first.length());
 		pos += sizeof(wchar_t) * keyval.first.length();
 		
 		//delimiter
-		*(buffer_pointer + pos) = 0;
-		pos += 1;
+		*((wchar_t*)(buffer + pos)) = 0;
+		pos += sizeof(wchar_t);
 			
 		//typeid
 		size_t _typeid = typeid(*keyval.second).hash_code();
-		*(size_t*)(buffer_pointer + pos) = _typeid;
+		*(size_t*)(buffer + pos) = _typeid;
 		pos += sizeof(size_t);
 
 		//data
 		if (_typeid == typeid(Boolean).hash_code())
 		{
-			*(bool*)(buffer_pointer + pos) = ((Boolean*)keyval.second)->data;
+			*(bool*)(buffer + pos) = ((Boolean*)keyval.second)->data;
 			pos += sizeof(bool);
 		}
 		else if (_typeid == typeid(Int8).hash_code())
 		{
-			*(char*)(buffer_pointer + pos) = ((Int8*)keyval.second)->data;
+			*(char*)(buffer + pos) = ((Int8*)keyval.second)->data;
 			pos += sizeof(char);
 		}
 		else if (_typeid == typeid(Int16).hash_code())
 		{
-			*(short*)(buffer_pointer + pos) = ((Int16*)keyval.second)->data;
+			*(short*)(buffer + pos) = ((Int16*)keyval.second)->data;
 			pos += sizeof(short);
 		}
 		else if (_typeid == typeid(Int32).hash_code())
 		{
-			*(int*)(buffer_pointer + pos) = ((Int32*)keyval.second)->data;
+			*(int*)(buffer + pos) = ((Int32*)keyval.second)->data;
 			pos += sizeof(int);
 		}
 		else if (_typeid == typeid(Int64).hash_code())
 		{
-			*(long long*)(buffer_pointer + pos) = ((Int64*)keyval.second)->data;
+			*(long long*)(buffer + pos) = ((Int64*)keyval.second)->data;
 			pos += sizeof(long long);
 		}
 		else if (_typeid == typeid(UInt8).hash_code())
 		{
-			*(unsigned char*)(buffer_pointer + pos) = ((UInt8*)keyval.second)->data;
+			*(unsigned char*)(buffer + pos) = ((UInt8*)keyval.second)->data;
 			pos += sizeof(unsigned char);
 		}
 		else if (_typeid == typeid(UInt16).hash_code())
 		{
-			*(unsigned short*)(buffer_pointer + pos) = ((UInt16*)keyval.second)->data;
+			*(unsigned short*)(buffer + pos) = ((UInt16*)keyval.second)->data;
 			pos += sizeof(unsigned short);
 		}
 		else if (_typeid == typeid(UInt32).hash_code())
 		{
-			*(unsigned int*)(buffer_pointer + pos) = ((UInt32*)keyval.second)->data;
+			*(unsigned int*)(buffer + pos) = ((UInt32*)keyval.second)->data;
 			pos += sizeof(unsigned int);
 		}
 		else if (_typeid == typeid(UInt64).hash_code())
 		{
-			*(unsigned long long*)(buffer_pointer + pos) = ((UInt64*)keyval.second)->data;
+			*(unsigned long long*)(buffer + pos) = ((UInt64*)keyval.second)->data;
 			pos += sizeof(unsigned long long);
 		}
 		else if (_typeid == typeid(Float).hash_code())
 		{
-			*(float*)(buffer_pointer + pos) = ((Float*)keyval.second)->data;
+			*(float*)(buffer + pos) = ((Float*)keyval.second)->data;
 			pos += sizeof(float);
 		}
 		else if (_typeid == typeid(String).hash_code())
@@ -403,12 +425,12 @@ int Dictionary::serialize_all(unsigned char** buffer_pointer)
 			std::wstring str = ((String*)keyval.second)->data;
 
 			//data string
-			memcpy(buffer_pointer + pos, str.c_str(), sizeof(wchar_t) * str.length());
+			memcpy(buffer + pos, str.c_str(), sizeof(wchar_t) * str.length());
 			pos += sizeof(wchar_t) * str.length();
 
 			//delimiter
-			*(buffer_pointer + pos) = 0;
-			pos += 1;
+			*((wchar_t*)(buffer + pos)) = 0;
+			pos += sizeof(wchar_t);
 		}
 	}
 
@@ -486,7 +508,7 @@ int Dictionary::deserialize_all(unsigned char* buffer)
 		{
 			std::wstring data_str = std::wstring((wchar_t*)(buffer + buffer_pos));
 			dict[key_name] = new String(data_str);
-			buffer_pos += sizeof(wchar_t) * data_str.length();
+			buffer_pos += sizeof(wchar_t) * (data_str.length()+1);
 		}
 	}
 

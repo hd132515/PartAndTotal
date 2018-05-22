@@ -189,9 +189,9 @@ UINT CTeilUndAllesDoc::possible_gi_id()
 	return possible_id;
 }
 
-void CTeilUndAllesDoc::add_node(std::wstring nodename, CPoint& pt)
+void CTeilUndAllesDoc::add_node(CPoint& pt)
 {
-	Node* nodeentry = project.add_node(nodename);
+	Node* nodeentry = project.add_node(L"");
 	if (nodeentry == NULL)
 	{
 		AfxMessageBox(L"같은 문제 노드가 이미 있음.");
@@ -210,6 +210,23 @@ void CTeilUndAllesDoc::remove_selected_node()
 	if ((selectedNodeGI = dynamic_cast<NodeGI*>(selected_obj)) != NULL)
 	{
 		UINT nodeid = (selectedNodeGI->get_node()->getid());
+
+		//delete all dependency connected with the selected node
+		std::vector<std::unordered_map<UINT, DependencyGI*>::iterator> deleting_list;
+		for (auto itr = set_dependencygi.begin(); itr != set_dependencygi.end(); itr++)
+		{
+			Dependency* dep_entry = itr->second->get_dependency();
+			if (dep_entry->getid1() == nodeid || dep_entry->getid2() == nodeid)
+			{
+				deleting_list.push_back(itr);
+			}
+		}
+
+		for (auto itr : deleting_list)
+		{
+			set_dependencygi.erase(itr);
+		}
+
 		if (project.remove_node(nodeid) < 0) {
 			AfxMessageBox(L"개발 문제");
 			return;
@@ -369,7 +386,7 @@ void CTeilUndAllesDoc::export_graphic_interface(unsigned char** buffer_pointer, 
 	header.gen_header.layerlength = header_length + nodegi_table_length + dependencygi_table_length;
 	header.number_of_nodes = set_nodegi.size();
 	header.number_of_dependency = set_dependencygi.size();
-	header.selected_interface_id = selected_obj->get_id();
+	header.selected_interface_id = selected_obj == NULL ? -1 : selected_obj->get_id();
 
 	int cnt = 0;
 	for (auto nodegi : set_nodegi)

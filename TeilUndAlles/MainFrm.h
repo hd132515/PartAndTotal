@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "DetailInfoPane.h"
+
 class CMainFrame : public CMDIFrameWndEx
 {
 	DECLARE_DYNAMIC(CMainFrame)
@@ -12,6 +14,7 @@ public:
 
 // 특성입니다.
 public:
+	CDetailInfoPane* get_detail_info_pane();
 
 // 작업입니다.
 public:
@@ -30,6 +33,7 @@ public:
 #endif
 
 protected:  // 컨트롤 모음이 포함된 멤버입니다.
+	CDetailInfoPane		detailinfo;
 	CMFCMenuBar       m_wndMenuBar;
 	CMFCToolBar       m_wndToolBar;
 	CMFCStatusBar     m_wndStatusBar;

@@ -191,15 +191,18 @@
     <ClInclude Include="DeleteDependencyDlg.h" />
     <ClInclude Include="Dependency.h" />
     <ClInclude Include="DependencyGI.h" />
+    <ClInclude Include="DependencyInfoWnd.h" />
+    <ClInclude Include="DetailInfoPane.h" />
+    <ClInclude Include="DetailInfoWnd.h" />
     <ClInclude Include="Dictionary.h" />
     <ClInclude Include="FileStructure.h" />
     <ClInclude Include="FrontendFileStructure.h" />
     <ClInclude Include="GraphFileStructure.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="AbstractGraphicInterface.h" />
-    <ClInclude Include="NewNodeDlg.h" />
     <ClInclude Include="Node.h" />
     <ClInclude Include="NodeGI.h" />
+    <ClInclude Include="PleaseSelectWnd.h" />
     <ClInclude Include="Primitives.h" />
     <ClInclude Include="Project.h" />
     <ClInclude Include="Resource.h" />
@@ -215,11 +218,14 @@
     <ClCompile Include="DeleteDependencyDlg.cpp" />
     <ClCompile Include="Dependency.cpp" />
     <ClCompile Include="DependencyGI.cpp" />
+    <ClCompile Include="DependencyInfoWnd.cpp" />
+    <ClCompile Include="DetailInfoPane.cpp" />
+    <ClCompile Include="DetailInfoWnd.cpp" />
     <ClCompile Include="Dictionary.cpp" />
     <ClCompile Include="MainFrm.cpp" />
-    <ClCompile Include="NewNodeDlg.cpp" />
     <ClCompile Include="Node.cpp" />
     <ClCompile Include="NodeGI.cpp" />
+    <ClCompile Include="PleaseSelectWnd.cpp" />
     <ClCompile Include="Project.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

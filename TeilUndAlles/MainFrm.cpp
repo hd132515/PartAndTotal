@@ -45,6 +45,11 @@ CMainFrame::~CMainFrame()
 {
 }
 
+CDetailInfoPane* CMainFrame::get_detail_info_pane()
+{
+	return &detailinfo;
+}
+
 int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
 	if (CMDIFrameWndEx::OnCreate(lpCreateStruct) == -1)
@@ -106,6 +111,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	DockPane(&m_wndToolBar);
 
 
+
 	// Visual Studio 2005 스타일 도킹 창 동작을 활성화합니다.
 	CDockingManager::SetDockingMode(DT_SMART);
 	// Visual Studio 2005 스타일 도킹 창 자동 숨김 동작을 활성화합니다.
@@ -153,6 +159,10 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	// 창 제목 표시줄에서 문서 이름 및 응용 프로그램 이름의 순서를 전환합니다.
 	// 문서 이름이 축소판 그림과 함께 표시되므로 작업 표시줄의 기능성이 개선됩니다.
 	ModifyStyle(0, FWS_PREFIXTITLE);
+
+	detailinfo.Create(L"상세 정보", this, CSize(300, 900), TRUE, 1000, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | CBRS_RIGHT | CBRS_FLOAT_MULTI);
+	detailinfo.EnableDocking(CBRS_ALIGN_ANY);
+	DockPane(&detailinfo);
 
 	return 0;
 }

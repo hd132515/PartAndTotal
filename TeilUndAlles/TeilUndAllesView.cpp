@@ -9,9 +9,9 @@
 #include "TeilUndAlles.h"
 #endif
 
+#include "MainFrm.h"
 #include "TeilUndAllesDoc.h"
 #include "TeilUndAllesView.h"
-#include "NewNodeDlg.h"
 
 #include "AbstractGraphicInterface.h"
 #include <chrono>
@@ -210,19 +210,9 @@ void CTeilUndAllesView::OnNewNode()
 
 void CTeilUndAllesView::add_node(CTeilUndAllesDoc* pDoc, CPoint& pt)
 {
-	draw_prenode(pt);
-
-	CNewNodeDlg dlg;
-	INT_PTR res = dlg.DoModal();
-
-	if (res == IDOK)
-	{
-		pDoc->add_node(dlg.nodename, pt);
-		pDoc->SetModifiedFlag();
-		pDoc->UpdateAllViews(NULL);
-	}
-	else
-		Invalidate();
+	pDoc->add_node(pt);
+	pDoc->SetModifiedFlag();
+	pDoc->UpdateAllViews(NULL);
 
 	editing_mode = EditingMode::NONE;
 }
@@ -236,7 +226,9 @@ void CTeilUndAllesView::OnRemoveNode()
 
 void CTeilUndAllesView::remove_node(CTeilUndAllesDoc* pDoc)
 {
-	if (AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
+	if (selected != NULL && 
+		typeid(*selected) == typeid(NodeGI) && 
+		AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
 	{
 		pDoc->remove_selected_node();
 		pDoc->SetModifiedFlag();
@@ -287,7 +279,9 @@ void CTeilUndAllesView::OnRemoveDependency()
 
 void CTeilUndAllesView::remove_dependency(CTeilUndAllesDoc* pDoc)
 {
-	if (AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
+	if (selected != NULL &&
+		typeid(*selected) == typeid(DependencyGI) && 
+		AfxMessageBox(L"진짜 제거?", MB_OKCANCEL) == IDOK)
 	{
 		pDoc->remove_selected_dependency();
 		pDoc->UpdateAllViews(NULL);
@@ -361,7 +355,24 @@ void CTeilUndAllesView::OnLButtonDown(UINT nFlags, CPoint point)
 		editing_mode == EditingMode::CREATE_DEP ||
 		editing_mode == EditingMode::REMOVE_DEP)
 	{
+		CMainFrame* mainframe = (CMainFrame*)AfxGetMainWnd();
 		selected = pDoc->select_interface(point);
+		if (selected == NULL)
+		{
+			mainframe->get_detail_info_pane()->not_selected();
+		}
+		else
+		{
+			auto type = typeid(*selected).hash_code();
+			if (type == typeid(NodeGI).hash_code())
+			{
+				mainframe->get_detail_info_pane()->view_info_selected_node(pDoc, ((NodeGI*)selected)->get_node());
+			}
+			else if (type == typeid(DependencyGI).hash_code())
+			{
+				mainframe->get_detail_info_pane()->view_info_selected_dep(pDoc, ((DependencyGI*)selected)->get_dependency());
+			}
+		}
 		pDoc->UpdateAllViews(NULL);
 	}
 
@@ -394,7 +405,7 @@ void CTeilUndAllesView::OnInitialUpdate()
 	for (int i = 0; i < 100; i++)
 	{
 		CPoint point((NODE_WIDTH+30)*((i%10)+1), (NODE_HEIGHT+15)*((i/10)+1));
-		pDoc->add_node(std::wstring(L"node")+std::to_wstring(i+1), point);
+		pDoc->add_node(point);
 	}*/
 }
 

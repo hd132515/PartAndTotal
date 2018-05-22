@@ -58,9 +58,6 @@
     <ClInclude Include="NodeGI.h">
       <Filter>Frontend</Filter>
     </ClInclude>
-    <ClInclude Include="NewNodeDlg.h">
-      <Filter>헤더 파일</Filter>
-    </ClInclude>
     <ClInclude Include="Dependency.h">
       <Filter>Backend</Filter>
     </ClInclude>
@@ -91,6 +88,18 @@
     <ClInclude Include="GraphFileStructure.h">
       <Filter>Backend</Filter>
     </ClInclude>
+    <ClInclude Include="DetailInfoPane.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DetailInfoWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="DependencyInfoWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="PleaseSelectWnd.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TeilUndAlles.cpp">
@@ -120,9 +129,6 @@
     <ClCompile Include="NodeGI.cpp">
       <Filter>Frontend</Filter>
     </ClCompile>
-    <ClCompile Include="NewNodeDlg.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="DependencyGI.cpp">
       <Filter>Frontend</Filter>
     </ClCompile>
@@ -137,6 +143,18 @@
     </ClCompile>
     <ClCompile Include="Dictionary.cpp">
       <Filter>Backend</Filter>
+    </ClCompile>
+    <ClCompile Include="DetailInfoPane.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DetailInfoWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="DependencyInfoWnd.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="PleaseSelectWnd.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
